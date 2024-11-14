@@ -3,7 +3,7 @@ import plotly.express as px
 import hashlib as hl
 from dash import Dash, dcc, html, Input, Output
 
-OS_df = pd.read_csv(r"C:\Code\Projekt-OS\athlete_events.csv")
+OS_df = pd.read_csv(r"C:\Code\Seminarium_OS\athlete_events.csv")
 OS_fr_df = OS_df[OS_df['Team'] == 'France'].copy()
 def hash_name(name):
     return hl.sha256(name.encode()).hexdigest()
