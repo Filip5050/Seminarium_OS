@@ -23,6 +23,10 @@ medals_per_OS.head()
 #Förberedande för fjärde dashboarden
 ages_sort_OS = OS_fr_df["Age"].dropna().sort_values()
 
+#Förberedande för femte dashboarden
+cities = OS_fr_df["City"].dropna().unique()
+cities_sorted = sorted(cities)
+
 
 
 
@@ -69,6 +73,17 @@ app.layout = html.Div([
         dcc.Graph(
             figure=px.histogram(ages_sort_OS)
         )
+    ]),
+    html.Hr(),
+    html.Div([
+        html.H2(children="Hur mycket medaljer frankrike fick i de olika städerna"),
+        html.Label("Välj stad"),
+        dcc.Dropdown(
+            id="city-dropdown",
+            options=[{"label":str(city),"value": city} for city in cities_sorted],
+            value=cities_sorted[0]
+        ),
+        dcc.Graph(id="city-graph")
     ])
 ])
 
@@ -83,6 +98,18 @@ def update_graph(selected_year):
     filtered_df = OS_fr_df[OS_fr_df["Year"] == selected_year]
 
     fig = px.histogram(filtered_df, x="Medal", y="ID", title=f"Medals they got year {selected_year}")
+    return fig
+
+@app.callback(
+    Output("city-graph", "figure"),
+    [Input("city-dropdown", "value")]
+)
+
+
+def update_city(selected_city):
+    filtered_city = OS_fr_df[OS_fr_df["City"] == selected_city]
+    medals_count = filtered_city.groupby("Medal").size().reset_index(name="Count")
+    fig = px.bar(medals_count, x="Medal", y="Count", title=f"Medaljer i {selected_city}")
     return fig
 
 if __name__ == "__main__":
