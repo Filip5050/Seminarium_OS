@@ -27,6 +27,9 @@ ages_sort_OS = OS_fr_df["Age"].dropna().sort_values()
 cities = OS_fr_df["City"].dropna().unique()
 cities_sorted = sorted(cities)
 
+#Förberedande flr sjätte dashboarden
+gender_fr = OS_fr_df["Sex"]
+
 
 
 
@@ -55,7 +58,7 @@ app.layout = html.Div([
         html.H2(children="Medaljer i sporten"),
         #Här skapar jag en barplot som har Sport som x värde och medals som y värde.
         dcc.Graph(
-            figure=px.bar(sorted_sports, x="Sport", y="medals")
+            figure=px.bar(sorted_sports, x="Sport", y="medals", color="Sport")
         )
     ]),
     html.Hr(),
@@ -64,14 +67,14 @@ app.layout = html.Div([
     html.Div([
         html.H2(children="Hur många medaljer för åren"),
     dcc.Graph(
-        figure=px.bar(medals_per_OS,x="Games", y="Medals")
+        figure=px.bar(medals_per_OS,x="Games", y="Medals", color="Games")
     )
     ]),
     html.Hr(),
     html.Div([
         html.H2(children="Histogram över åldrarna"),
         dcc.Graph(
-            figure=px.histogram(ages_sort_OS)
+            figure=px.histogram(OS_fr_df, x="Age", y="ID", color="Age")
         )
     ]),
     html.Hr(),
@@ -84,6 +87,13 @@ app.layout = html.Div([
             value=cities_sorted[0]
         ),
         dcc.Graph(id="city-graph")
+    ]),
+    html.Hr(),
+    html.Div([
+        html.H2(children="Hur många kvinnor och män var med och tävlade för frankrike i OS"),
+        dcc.Graph(
+            figure=px.bar(OS_fr_df, x="Sex", y="ID", color="Sex")
+        )
     ])
 ])
 
@@ -97,7 +107,11 @@ app.layout = html.Div([
 def update_graph(selected_year):
     filtered_df = OS_fr_df[OS_fr_df["Year"] == selected_year]
 
-    fig = px.histogram(filtered_df, x="Medal", y="ID", title=f"Medals they got year {selected_year}")
+    fig = px.histogram(filtered_df, x="Medal", y="ID", color="Medal", color_discrete_map={
+            "Gold": "yellow", 
+            "Silver": "grey", 
+            "Bronze": "brown",}, 
+        title=f"Medals they got year {selected_year}")
     return fig
 
 @app.callback(
@@ -109,7 +123,11 @@ def update_graph(selected_year):
 def update_city(selected_city):
     filtered_city = OS_fr_df[OS_fr_df["City"] == selected_city]
     medals_count = filtered_city.groupby("Medal").size().reset_index(name="Count")
-    fig = px.bar(medals_count, x="Medal", y="Count", title=f"Medaljer i {selected_city}")
+    fig = px.bar(medals_count, x="Medal", y="Count",  color="Medal", color_discrete_map={
+            "Gold": "yellow", 
+            "Silver": "grey", 
+            "Bronze": "brown",},
+        title=f"Medaljer i {selected_city}")
     return fig
 
 if __name__ == "__main__":
