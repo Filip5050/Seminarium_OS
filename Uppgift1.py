@@ -42,8 +42,8 @@ app.layout = html.Div([
     
     #Första dashboarfen
     html.Div([
-        html.H2(children="Medals by Year"), #Text som kommer visas över dashboarden
-        html.Label("Select Year"),
+        html.H2(children="Medaljen för åren"), #Text som kommer visas över dashboarden
+        html.Label("Välj år"),
         dcc.Dropdown( #Här används dropdown som gör att man kan intergrera med dashboarden
             id="year-dropdown", #Id är något jag kommer komma tillbaka till senare när jag kodar min callback funktion
             options=[{"label": str(year), "value": year} for year in OS_fr_df_years], #Här är de olika valen man kan intergrera med och vilket är de olika åren som finns is csv filen
