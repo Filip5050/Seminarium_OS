@@ -27,8 +27,12 @@ ages_sort_OS = OS_fr_df["Age"].dropna().sort_values()
 cities = OS_fr_df["City"].dropna().unique()
 cities_sorted = sorted(cities)
 
-#Förberedande flr sjätte dashboarden
+#Förberedande för sjätte dashboarden
 gender_fr = OS_fr_df["Sex"]
+
+#Förberedande för sjunde dashboarden
+sport = OS_fr_df["Sport"].dropna().unique()
+sport_sorted = sorted(sport)
 
 
 
@@ -71,6 +75,7 @@ app.layout = html.Div([
     )
     ]),
     html.Hr(),
+    #Fjärde dashboarden
     html.Div([
         html.H2(children="Histogram över åldrarna"),
         dcc.Graph(
@@ -78,6 +83,7 @@ app.layout = html.Div([
         )
     ]),
     html.Hr(),
+    #femte dashboarden
     html.Div([
         html.H2(children="Hur mycket medaljer frankrike fick i de olika städerna"),
         html.Label("Välj stad"),
@@ -89,31 +95,45 @@ app.layout = html.Div([
         dcc.Graph(id="city-graph")
     ]),
     html.Hr(),
+    #sjätte dashboarden
     html.Div([
         html.H2(children="Hur många kvinnor och män var med och tävlade för frankrike i OS"),
         dcc.Graph(
             figure=px.bar(OS_fr_df, x="Sex", y="ID", color="Sex")
         )
-    ])
+    ]),
+    html.Hr(),
+    #sjunde dashboarden
+    html.Div([
+        html.H2(children="Spelarnas längd inom en sport"),
+        html.Label("Välj sport"),
+        dcc.Dropdown(
+            id="7th-dropdown",
+            options=[{"label":str(sport),"value": sport} for sport in sport],
+            value=sport[0]
+        ),
+        dcc.Graph(id="sport-graph")
+        ])
 ])
 
 #Denna callbacken kopplas med min dropdown jag gjorde innan i dashboard 1
-#när year-dropwdown uppdateras och värdet ändras så kommer min figure att uppdateras där graph id finns
+#när year-dropwdown uppdateras och värdet ändras så kommer min figure att uppdateras 
 @app.callback(
     Output("graph", "figure"),
     [Input("year-dropdown", "value")] 
 )
 #Funktionen som skapar grafen som kommer synas i dashboard 1.
 def update_graph(selected_year):
-    filtered_df = OS_fr_df[OS_fr_df["Year"] == selected_year]
-
-    fig = px.histogram(filtered_df, x="Medal", y="ID", color="Medal", color_discrete_map={
+    filtered_df = OS_fr_df[OS_fr_df["Year"] == selected_year] #filtrerar datan så jag bara får ut data från året jag väljer
+    medals = filtered_df.groupby("Medal").size().reset_index(name="number of medals")
+    fig = px.histogram(medals, x="Medal", y="number of medals", color="Medal", color_discrete_map={
             "Gold": "yellow", 
             "Silver": "grey", 
             "Bronze": "brown",}, 
         title=f"Medals they got year {selected_year}")
     return fig
 
+#Detta gör samma som callbacken över fast för femte dashboarden
 @app.callback(
     Output("city-graph", "figure"),
     [Input("city-dropdown", "value")]
@@ -122,12 +142,25 @@ def update_graph(selected_year):
 
 def update_city(selected_city):
     filtered_city = OS_fr_df[OS_fr_df["City"] == selected_city]
-    medals_count = filtered_city.groupby("Medal").size().reset_index(name="Count")
-    fig = px.bar(medals_count, x="Medal", y="Count",  color="Medal", color_discrete_map={
+    medals = filtered_city.groupby("Medal").size().reset_index(name="number of medals") #här grupperar vi de olika medaljerna för att göra svaren mer tydliga 
+    fig = px.bar(medals, x="Medal", y="number of medals",  color="Medal", color_discrete_map={
             "Gold": "yellow", 
             "Silver": "grey", 
             "Bronze": "brown",},
         title=f"Medaljer i {selected_city}")
+    return fig
+
+@app.callback(
+    Output("sport-graph", "figure"),
+    [Input("7th-dropdown", "value")]
+)
+
+def update_height(selected_sport): 
+    filtered_sport = OS_fr_df[OS_fr_df["Sport"] == selected_sport]
+    height = filtered_sport.groupby("Height").size().reset_index(name="number of players")
+    fig = px.histogram(height, x="Height", y="number of players", color="Height", barmode="group", nbins=10, title=f"Höjden på spelarna i {selected_sport}"
+    )
+    
     return fig
 
 if __name__ == "__main__":
