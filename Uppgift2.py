@@ -37,7 +37,7 @@ app.layout = html.Div([
         html.H1("Åldersfördelning i Basket, Judo och Fotboll"),  
         html.Label("Välj sport"),  
         dcc.Dropdown(
-        id="sport-dropdown",
+        id="age-dropdown",
         options=[
             {"label": "Basketball", "value": "Basketball"},
             {"label": "Judo", "value": "Judo"},
@@ -46,6 +46,21 @@ app.layout = html.Div([
         value="Basketball"  # Förvald sport
     ),
     dcc.Graph(id="age-distribution-graph")  # Diagram för åldersfördelning
+    ]),
+    html.Hr(),
+    html.Div([
+        html.H1("Hur många deltagare det är ifrån de olika kontinenterna i sporterna Basket, Judo och Fotboll"),
+        html.Label("Välj sport"),
+        dcc.Dropdown(
+        id="player-dropdown",
+        options=[
+            {"label": "Basketball", "value": "Basketball"},
+            {"label": "Judo", "value": "Judo"},
+            {"label": "Football", "value": "Football"}
+        ],  # Endast dessa sporter är valbara
+        value="Basketball"  # Förvald sport
+    ),  
+    dcc.Graph(id="players-graph")      
     ])
 ])
 
@@ -75,7 +90,7 @@ def height_graph(selected_sport):
 
 @app.callback(
     Output("age-distribution-graph", "figure"),
-    [Input("sport-dropdown", "value")]
+    [Input("age-dropdown", "value")]
 )
 def update_age_distribution(selected_sport):
     filtered_sports_df = OS_df[OS_df["Sport"].isin(["Basketball", "Judo", "Football"])]
@@ -100,6 +115,15 @@ def update_age_distribution(selected_sport):
         xaxis=dict(tickmode="linear")  
     )
     
+    return fig
+@app.callback(
+    Output("players-graph", "figure"),
+    [Input("player-dropdown", "value")]
+)
+def palyer_graph(selected_sport):
+    filtered_data = OS_df[OS_df["Sport"] == selected_sport] #filtrerar datan så jag bara får ut data från året jag väljer
+    medals = filtered_data.groupby(["NOC","ID"]).size().reset_index(name="Players") #
+    fig = px.histogram(medals, x="NOC", y="Players", barmode="stack",  color="NOC", labels=f" Hur många spelare i läderna i{selected_sport}")
     return fig
 if __name__ == "__main__":
     app.run_server(debug=True)
