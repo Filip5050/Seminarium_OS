@@ -2,7 +2,7 @@ import pandas as pd
 import plotly.express as px
 from dash import Dash, dcc, html, Input, Output
 
-OS_df = pd.read_csv(r"athlete_events.csv")
+OS_df = pd.read_csv(r"C:\Code\Seminarium_OS\athlete_events.csv")
 
 # Filtrera datasetet för att inkludera endast Basket, Judo och Fotboll
 filtered_sports_df = OS_df[OS_df["Sport"].isin(["Basketball", "Judo", "Football"])]

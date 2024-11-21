@@ -31,6 +31,21 @@ app.layout = html.Div([
             value="Basketball"
         ),
         dcc.Graph(id="längd-graph")
+    ]),
+    html.Hr(),
+    html.Div([
+        html.H1("Åldersfördelning i Basket, Judo och Fotboll"),  
+        html.Label("Välj sport"),  
+        dcc.Dropdown(
+        id="sport-dropdown",
+        options=[
+            {"label": "Basketball", "value": "Basketball"},
+            {"label": "Judo", "value": "Judo"},
+            {"label": "Football", "value": "Football"}
+        ],  # Endast dessa sporter är valbara
+        value="Basketball"  # Förvald sport
+    ),
+    dcc.Graph(id="age-distribution-graph")  # Diagram för åldersfördelning
     ])
 ])
 
@@ -58,5 +73,33 @@ def height_graph(selected_sport):
     fig = px.histogram(filtered_data, x="Height",y="ID", title=f"längd i {selected_sport}")
     return fig
 
+@app.callback(
+    Output("age-distribution-graph", "figure"),
+    [Input("sport-dropdown", "value")]
+)
+def update_age_distribution(selected_sport):
+    filtered_sports_df = OS_df[OS_df["Sport"].isin(["Basketball", "Judo", "Football"])]
+    # Filtrera data för den valda sporten
+    filtered_data = filtered_sports_df[filtered_sports_df["Sport"] == selected_sport]
+    
+    # Skapa ett histogram för åldersfördelning
+    fig = px.histogram(
+        filtered_data,
+        x="Age",
+        title=f"Åldersfördelning i {selected_sport}",
+        labels={"Age": "Ålder", "count": "Antal Idrottare"},
+        color_discrete_sequence=["#1f77b4"],
+        category_orders={"Age": sorted(filtered_data["Age"].unique())}  # Säkerställer sortering av åldrar
+    )
+    
+    # Säkerställa att åldrar inte grupperas
+    fig.update_layout(
+        xaxis_title="Ålder",
+        yaxis_title="Antal Idrottare",
+        bargap=0.1,  
+        xaxis=dict(tickmode="linear")  
+    )
+    
+    return fig
 if __name__ == "__main__":
     app.run_server(debug=True)
