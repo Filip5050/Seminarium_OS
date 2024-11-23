@@ -9,6 +9,8 @@ def hash_name(name):
     return hl.sha256(name.encode()).hexdigest()
 OS_fr_df['Name'] = OS_fr_df['Name'].apply(hash_name) #Här anonymiserar alla spelare i frankrike lager
 
+
+
 #Förberedande för första dashboarden
 OS_fr_df_years = sorted(OS_fr_df["Year"].unique()) #Sorterar åren i ordning och tar bort alla kopior så jag inte kan välja samma årtal flera gånger i dashboarden
 
@@ -28,7 +30,7 @@ cities = OS_fr_df["City"].dropna().unique()
 cities_sorted = sorted(cities)
 
 #Förberedande för sjätte dashboarden
-gender_fr = OS_fr_df["Sex"]
+OS_fr_df = OS_fr_df.dropna(subset=["Sex"])
 
 #Förberedande för sjunde dashboarden
 sport = OS_fr_df["Sport"].dropna().unique()
@@ -39,8 +41,10 @@ sport_sorted = sorted(sport)
 
 #initierar dashboarden
 app = Dash(__name__)
+server = app.server 
 #Skapar en layout som får en titel
 app.layout = html.Div([
+
     html.H1(children="Statistik för Frankrike i OS"),
     html.Hr(),
     
