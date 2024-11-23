@@ -2,8 +2,11 @@ import pandas as pd
 import plotly.express as px
 import hashlib as hl
 from dash import Dash, dcc, html, Input, Output
+import os
 
-OS_df = pd.read_csv(r"C:\Code\Seminarium_OS\athlete_events.csv")
+
+file_path = os.path.join(os.path.dirname(__file__), "athlete_events.csv")
+OS_df = pd.read_csv(file_path)
 OS_fr_df = OS_df[OS_df['Team'] == 'France'].copy() #Skapar en variabel som visar all statistik för laget frankrike
 def hash_name(name):
     return hl.sha256(name.encode()).hexdigest()
