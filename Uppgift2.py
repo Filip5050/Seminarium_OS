@@ -3,9 +3,8 @@ import plotly.express as px
 from dash import Dash, dcc, html, Input, Output
 import os
 
-
+#Läser in filen
 file_path = os.path.join(os.path.dirname(__file__), "athlete_events.csv")
-
 OS_df = pd.read_csv(file_path)
 
 app = Dash(__name__) #initiserar Dash
@@ -26,23 +25,23 @@ app.layout = html.Div([
     ]),
     html.Hr(),
     html.Div([
-        html.H1("längd skillnaden mellan sporterna"),
+        html.H1("längd skillnaden mellan sporterna"), #Titeln på dashboarden
         html.Label("Välj Sport"),
         dcc.Dropdown(
-            id="längd-dropdown",
+            id="längd-dropdown", #Id för callbacken
             options=[
-                {"label": "Basketball", "value": "Basketball"},{"label": "Judo", "value": "Judo"},{"label": "Football", "value": "Football"},
+                {"label": "Basketball", "value": "Basketball"},{"label": "Judo", "value": "Judo"},{"label": "Football", "value": "Football"}, #De olika valen till dashboarden
             ],
-            value="Basketball"
+            value="Basketball" #Första sporten man ser
         ),
-        dcc.Graph(id="längd-graph")
+        dcc.Graph(id="längd-graph") #Grafen som används till callbacken och funktionen som gör själva grafen
     ]),
     html.Hr(),
     html.Div([
-        html.H1("Åldersfördelning i Basket, Judo och Fotboll"),  
+        html.H1("Åldersfördelning i Basket, Judo och Fotboll"), 
         html.Label("Välj sport"),  
         dcc.Dropdown(
-        id="age-dropdown",
+        id="age-dropdown", #Id för callbacken
         options=[
             {"label": "Basketball", "value": "Basketball"},
             {"label": "Judo", "value": "Judo"},
@@ -74,23 +73,27 @@ app.layout = html.Div([
     Output("medal-graph", "figure"),
     [Input("sport-dropdown", "value")]
 )
+#Funktionen som används varje gång man väljer något i dropdownen
 def sport_graph(selected_sport):
     filtered_data = OS_df[OS_df["Sport"] == selected_sport] #filtrerar datan så jag bara får ut data från året jag väljer
-    medals = filtered_data.groupby(["NOC","Medal"]).size().reset_index(name="Medaljer") #
-    fig = px.histogram(medals, x="NOC", y="Medaljer", barmode="stack",  color="Medal", color_discrete_map={
+    medals = filtered_data.groupby(["NOC","Medal"]).size().reset_index(name="Medaljer") #Här grupperar man medaljerna så den får ut rätt medalj typ
+    fig = px.histogram(medals, x="NOC", y="Medaljer", barmode="stack",  color="Medal", color_discrete_map={ #Ger färg till de olika medalj typerna så det ser snyggare ut
             "Gold": "yellow", 
             "Silver": "grey", 
             "Bronze": "brown",}, 
         labels=f" Medaljer sporterna har fått i {selected_sport}")
     return fig
 
+#callback för andra funktionen som används varje gång man väljer något i dropdownen i dashboord 2
 @app.callback(
     Output("längd-graph", "figure"),
     [Input("längd-dropdown", "value")]
 )
+#Funktion för dashboarden 2 som uppdaterar dashboarden varjegång man väljer något i dropdownen
 def height_graph(selected_sport):
-    filtered_data = OS_df[OS_df["Sport"] == selected_sport]
-    fig = px.histogram(filtered_data, x="Height",y="ID", title=f"längd i {selected_sport}")
+    filtered_data = OS_df[OS_df["Sport"] == selected_sport] 
+    fig = px.histogram(filtered_data, x="Height", title=f"längd i {selected_sport}", category_orders={"Height": sorted(filtered_data["Height"].unique())}) #Sorterar längderna och gör dom unika så man får rätt värde
+    #Fixar till dashboarden så X värdet och y värder får bättre namn
     fig.update_layout(
         xaxis_title="Längd",
         yaxis_title="Antal Idrottare",
@@ -131,10 +134,11 @@ def update_age_distribution(selected_sport):
     Output("players-graph", "figure"),
     [Input("player-dropdown", "value")]
 )
-def palyer_graph(selected_sport):
-    filtered_data = OS_df[OS_df["Sport"] == selected_sport] #filtrerar datan så jag bara får ut data från året jag väljer
-    medals = filtered_data.groupby(["NOC","ID"]).size().reset_index(name="Players") #
-    fig = px.histogram(medals, x="NOC", y="Players", barmode="stack", labels=f" Hur många spelare i läderna i{selected_sport}")
+def player_graph(selected_sport):
+    filtered_data = OS_df[OS_df["Sport"] == selected_sport] #filtrerar datan så jag bara får ut data från sporten jag väljer
+    players = filtered_data.groupby("NOC").size().reset_index(name="Players") #förbereder datan för histogramen så länderna får ut antal spelare som spelade sporterna 
+    #bygger histogramen
+    fig = px.histogram(players, x="NOC", y="Players", barmode="stack", labels=f" Hur många spelare i läderna i{selected_sport}")
     fig.update_layout(
         xaxis_title="Länder",
         yaxis_title="Hur många Idrottare",
