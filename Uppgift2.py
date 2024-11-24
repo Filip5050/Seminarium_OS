@@ -1,10 +1,15 @@
 import pandas as pd
 import plotly.express as px
 from dash import Dash, dcc, html, Input, Output
+import os
 
-OS_df = pd.read_csv(r"C:\Code\Seminarium_OS\athlete_events.csv")
+
+file_path = os.path.join(os.path.dirname(__file__), "athlete_events.csv")
+
+OS_df = pd.read_csv(file_path)
 
 app = Dash(__name__) #initiserar Dash
+server = app.server
 app.layout = html.Div([
     html.Div([
     html.H1("Medalj fördelningen mellan länderna i Basket och Judo"), #Ger dash datan en titel
@@ -86,6 +91,12 @@ def sport_graph(selected_sport):
 def height_graph(selected_sport):
     filtered_data = OS_df[OS_df["Sport"] == selected_sport]
     fig = px.histogram(filtered_data, x="Height",y="ID", title=f"längd i {selected_sport}")
+    fig.update_layout(
+        xaxis_title="Längd",
+        yaxis_title="Antal Idrottare",
+        bargap=0.1,  
+        xaxis=dict(tickmode="linear")  
+    )
     return fig
 
 @app.callback(
@@ -123,7 +134,13 @@ def update_age_distribution(selected_sport):
 def palyer_graph(selected_sport):
     filtered_data = OS_df[OS_df["Sport"] == selected_sport] #filtrerar datan så jag bara får ut data från året jag väljer
     medals = filtered_data.groupby(["NOC","ID"]).size().reset_index(name="Players") #
-    fig = px.histogram(medals, x="NOC", y="Players", barmode="stack",  color="NOC", labels=f" Hur många spelare i läderna i{selected_sport}")
+    fig = px.histogram(medals, x="NOC", y="Players", barmode="stack"q, labels=f" Hur många spelare i läderna i{selected_sport}")
+    fig.update_layout(
+        xaxis_title="Länder",
+        yaxis_title="Hur många Idrottare",
+        bargap=0.1,  
+        xaxis=dict(tickmode="linear")  
+    )
     return fig
 if __name__ == "__main__":
     app.run_server(debug=True)
