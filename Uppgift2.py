@@ -134,7 +134,7 @@ def update_age_distribution(selected_sport):
 def palyer_graph(selected_sport):
     filtered_data = OS_df[OS_df["Sport"] == selected_sport] #filtrerar datan så jag bara får ut data från året jag väljer
     medals = filtered_data.groupby(["NOC","ID"]).size().reset_index(name="Players") #
-    fig = px.histogram(medals, x="NOC", y="Players", barmode="stack"q, labels=f" Hur många spelare i läderna i{selected_sport}")
+    fig = px.histogram(medals, x="NOC", y="Players", barmode="stack", labels=f" Hur många spelare i läderna i{selected_sport}")
     fig.update_layout(
         xaxis_title="Länder",
         yaxis_title="Hur många Idrottare",
