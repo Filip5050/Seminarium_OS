@@ -8,7 +8,7 @@ file_path = os.path.join(os.path.dirname(__file__), "athlete_events.csv")
 OS_df = pd.read_csv(file_path)
 
 app = Dash(__name__) #initiserar Dash
-server2 = app.server
+servertwo = app.server
 app.layout = html.Div([
     html.Div([
     html.H1("Medalj fördelningen mellan länderna i Basket och Judo"), #Ger dash datan en titel
