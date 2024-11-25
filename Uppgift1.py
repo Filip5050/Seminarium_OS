@@ -12,10 +12,9 @@ def hash_name(name):
     return hl.sha256(name.encode()).hexdigest()
 OS_fr_df['Name'] = OS_fr_df['Name'].apply(hash_name) #Här anonymiserar alla spelare i frankrike lager
 
-
-
 #Förberedande för första dashboarden
 OS_fr_df_years = sorted(OS_fr_df["Year"].unique()) #Sorterar åren i ordning och tar bort alla kopior så jag inte kan välja samma årtal flera gånger i dashboarden
+
 
 #Förberedande för andra dashboarden
 medals_by_sport = OS_fr_df.groupby(["Sport"]).size().reset_index(name="medals") # Gruppera medaljerna efter sport och räkna antalet medaljer för varje sport
@@ -132,15 +131,22 @@ app.layout = html.Div([
 #Funktionen som skapar grafen som kommer synas i dashboard 1.
 def update_graph(selected_year):
     filtered_df = OS_fr_df[OS_fr_df["Year"] == selected_year] #filtrerar datan så jag bara får ut data från året jag väljer
-    medals = filtered_df.groupby("Medal").size().reset_index(name="number of medals")
+    medals = filtered_df.groupby("Medal").size().reset_index(name="number of medals") #Grupperar de olika medaljen för de olika typerna vilket behövs föra att skapa histogramen och ändrar indexet namn till number of medals
     fig = px.histogram(medals, x="Medal", y="number of medals", color="Medal", color_discrete_map={
             "Gold": "yellow", 
             "Silver": "grey", 
             "Bronze": "brown",}, 
         title=f"Medals they got year {selected_year}")
+    #fixar layouten och ändrar namnen på x linjen och y linjen
+    fig.update_layout(
+        xaxis_title="Typ av medalj",
+        yaxis_title="Antal medaljer",
+        bargap=0.1,  
+        xaxis=dict(tickmode="linear")  
+    )
     return fig
 
-#Detta gör samma som callbacken över fast för femte dashboarden
+#callback för femte dashboarden
 @app.callback(
     Output("city-graph", "figure"),
     [Input("city-dropdown", "value")]
@@ -149,24 +155,38 @@ def update_graph(selected_year):
 
 def update_city(selected_city):
     filtered_city = OS_fr_df[OS_fr_df["City"] == selected_city]
-    medals = filtered_city.groupby("Medal").size().reset_index(name="number of medals") #här grupperar vi de olika medaljerna för att göra svaren mer tydliga 
-    fig = px.bar(medals, x="Medal", y="number of medals",  color="Medal", color_discrete_map={
+    medals = filtered_city.groupby("Medal").size().reset_index(name="number of medals") #Grupperar de olika medaljen för de olika typerna vilket behövs föra att skapa histogramen och ändrar indexet namn till number of medals
+    fig = px.bar(medals, x="Medal", y="number of medals",  color="Medal", color_discrete_map={ # Ger olika medaljerna passande färg
             "Gold": "yellow", 
             "Silver": "grey", 
             "Bronze": "brown",},
         title=f"Medaljer i {selected_city}")
+    fig.update_layout(
+        xaxis_title="typ av medalj",
+        yaxis_title="antal medaljer",
+        bargap=0.1,  
+        xaxis=dict(tickmode="linear")  
+    )
     return fig
 
+#callback och funktion för sjunde dashboarden
 @app.callback(
     Output("sport-graph", "figure"),
     [Input("7th-dropdown", "value")]
 )
-
+#Funktion för sjunde dashboarden
 def update_height(selected_sport): 
+    #filtrera datan för valda sporten
     filtered_sport = OS_fr_df[OS_fr_df["Sport"] == selected_sport]
-    height = filtered_sport.groupby("Height").size().reset_index(name="number of players")
-    fig = px.histogram(height, x="Height", y="number of players", color="Height", barmode="group", nbins=10, title=f"Höjden på spelarna i {selected_sport}"
-    )
+    height = filtered_sport.groupby("Height").size().reset_index(name="number of players") #Förbereder histogramen så höjden får rätt antal spelare som är i den höjden.
+    fig = px.histogram(height, x="Height", y="number of players", color="Height", barmode="group", nbins=10, title=f"Höjden på spelarna i {selected_sport}")
+    fig.update_layout(
+        xaxis_title="Längd",
+        yaxis_title="Antal Idrottare",
+        bargap=0.1,  
+        xaxis=dict(tickmode="linear")  
+    )                   
+    
     
     return fig
 
