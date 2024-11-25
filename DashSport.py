@@ -11,7 +11,7 @@ app = Dash(__name__) #initiserar Dash
 servertwo = app.server
 app.layout = html.Div([
     html.Div([
-    html.H1("Medalj fördelningen mellan länderna i Basket och Judo"), #Ger dash datan en titel
+    html.H1("Medalj fördelningen mellan länderna i Basket, Judo och fotboll"), #Ger dash datan en titel
     html.Label("Välj sport"),
     dcc.Dropdown( #Skapar en dropdown som gör man kan välja vilka sporter vi ska använda
         id="sport-dropdown", #skapar en id som används till inputen i callback funktionen senare
