@@ -53,7 +53,7 @@ app.layout = html.Div([
     ]),
     html.Hr(),
     html.Div([
-        html.H1("Hur många deltagare det är ifrån de olika kontinenterna i sporterna Basket, Judo och Fotboll"),
+        html.H1("Hur många deltagare det är ifrån de olika länderna i sporterna Basket, Judo och Fotboll"),
         html.Label("Välj sport"),
         dcc.Dropdown(
         id="player-dropdown",
