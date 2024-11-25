@@ -25,7 +25,7 @@ app.layout = html.Div([
     ]),
     html.Hr(),
     html.Div([
-        html.H1("längd skillnaden mellan sporterna"), #Titeln på dashboarden
+        html.H1("Längd skillnaden mellan sporterna"), #Titeln på dashboarden
         html.Label("Välj Sport"),
         dcc.Dropdown(
             id="längd-dropdown", #Id för callbacken
