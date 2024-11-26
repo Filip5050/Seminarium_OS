@@ -7,7 +7,8 @@ import os
 
 file_path = os.path.join(os.path.dirname(__file__), "athlete_events.csv")
 OS_df = pd.read_csv(file_path)
-OS_fr_df = OS_df[OS_df['Team'] == 'France'].copy() #Skapar en variabel som visar all statistik för laget frankrike
+OS_fr_df = OS_df[OS_df['NOC'] == 'FRA'].copy() #Skapar en variabel som visar all statistik för laget frankrike
+
 def hash_name(name):
     return hl.sha256(name.encode()).hexdigest()
 OS_fr_df['Name'] = OS_fr_df['Name'].apply(hash_name) #Här anonymiserar alla spelare i frankrike lager
@@ -17,12 +18,16 @@ OS_fr_df_years = sorted(OS_fr_df["Year"].unique()) #Sorterar åren i ordning och
 
 
 #Förberedande för andra dashboarden
-medals_by_sport = OS_fr_df.groupby(["Sport"]).size().reset_index(name="medals") # Gruppera medaljerna efter sport och räkna antalet medaljer för varje sport
+medals_data = OS_fr_df[OS_fr_df['Medal'].notna()]
+medals_data = medals_data.drop_duplicates(subset=["Event", "Games", "Medal"])
+medals_by_sport = medals_data.groupby(["Sport"]).size().reset_index(name="medals") # Gruppera medaljerna efter sport och räkna antalet medaljer för varje sport
 sorted_sports = medals_by_sport.sort_values("medals", ascending=False)
 
 #Förberendade för tredje dashboarde 
-medals_per_OS = OS_fr_df.groupby("Games").size().reset_index(name="Medals")
-medals_per_OS.head()
+team_medals = OS_fr_df[OS_fr_df['Medal'].notna()]
+team_medals = team_medals.drop_duplicates(subset=["Event", "Games", "Medal"])
+medals_per_OS = team_medals.groupby("Games").size().reset_index(name="Medals")
+
 
 #Förberedande för fjärde dashboarden
 ages_sort_OS = OS_fr_df["Age"].dropna().sort_values()
@@ -32,7 +37,7 @@ cities = OS_fr_df["City"].dropna().unique()
 cities_sorted = sorted(cities)
 
 #Förberedande för sjätte dashboarden
-OS_fr_df = OS_fr_df.dropna(subset=["Sex"])
+gender_counts = OS_fr_df.drop_duplicates(subset=["ID"]).groupby("Sex").size().reset_index(name="Count")
 
 #Förberedande för sjunde dashboarden
 sport = OS_fr_df["Sport"].dropna().unique()
@@ -85,7 +90,7 @@ app.layout = html.Div([
     html.Div([
         html.H2(children="Histogram över åldrarna"),
         dcc.Graph(
-            figure=px.histogram(OS_fr_df, x="Age", y="ID", color="Age")
+            figure=px.histogram(OS_fr_df, x="Age", color="Age")
         )
     ]),
     html.Hr(),
@@ -105,7 +110,7 @@ app.layout = html.Div([
     html.Div([
         html.H2(children="Hur många kvinnor och män var med och tävlade för frankrike i OS"),
         dcc.Graph(
-            figure=px.bar(OS_fr_df, x="Sex", y="ID", color="Sex")
+            figure=px.histogram(gender_counts, x="Sex", y="Count", color="Sex")
         )
     ]),
     html.Hr(),
@@ -178,8 +183,8 @@ def update_city(selected_city):
 def update_height(selected_sport): 
     #filtrera datan för valda sporten
     filtered_sport = OS_fr_df[OS_fr_df["Sport"] == selected_sport]
-    height = filtered_sport.groupby("Height").size().reset_index(name="number of players") #Förbereder histogramen så höjden får rätt antal spelare som är i den höjden.
-    fig = px.histogram(height, x="Height", y="number of players", color="Height", barmode="group", nbins=10, title=f"Höjden på spelarna i {selected_sport}")
+    #Förberedande för sjunde dashboarden
+    fig = px.histogram(filtered_sport, x="Height", color="Height", barmode="group", nbins=10, title=f"Höjden på spelarna i {selected_sport}")
     fig.update_layout(
         xaxis_title="Längd",
         yaxis_title="Antal Idrottare",
