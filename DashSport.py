@@ -7,7 +7,7 @@ import os
 file_path = os.path.join(os.path.dirname(__file__), "athlete_events.csv")
 OS_df = pd.read_csv(file_path)
 
-app = Dash(__name__) #initiserar Dash
+app = Dash(__name__) # initiserar Dash
 servertwo = app.server
 app.layout = html.Div([
     html.Div([
@@ -25,7 +25,7 @@ app.layout = html.Div([
     ]),
     html.Hr(),
     html.Div([
-        html.H1("längd skillnaden mellan sporterna"), #Titeln på dashboarden
+        html.H1("Längd skillnaden mellan sporterna"), #Titeln på dashboarden
         html.Label("Välj Sport"),
         dcc.Dropdown(
             id="längd-dropdown", #Id för callbacken
