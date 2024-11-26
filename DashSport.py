@@ -76,8 +76,9 @@ app.layout = html.Div([
 #Funktionen som används varje gång man väljer något i dropdownen
 def sport_graph(selected_sport):
     filtered_data = OS_df[OS_df["Sport"] == selected_sport] #filtrerar datan så jag bara får ut data från året jag väljer
-    medals = filtered_data.groupby(["NOC","Medal"]).size().reset_index(name="Medaljer") #Här grupperar man medaljerna så den får ut rätt medalj typ
-    fig = px.histogram(medals, x="NOC", y="Medaljer", barmode="stack",  color="Medal", color_discrete_map={ #Ger färg till de olika medalj typerna så det ser snyggare ut
+    #Funktionen som används varje gång man väljer något i dropdownen
+    filtered_data = filtered_data.groupby(["NOC", "Medal"]).size().reset_index(name="Medalj")
+    fig = px.histogram(filtered_data, x="NOC", y="Medalj", barmode="stack",  color="Medal", color_discrete_map={ #Ger färg till de olika medalj typerna så det ser snyggare ut
             "Gold": "yellow", 
             "Silver": "grey", 
             "Bronze": "brown",}, 
