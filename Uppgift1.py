@@ -14,8 +14,7 @@ def hash_name(name):
 OS_fr_df['Name'] = OS_fr_df['Name'].apply(hash_name) #Här anonymiserar alla spelare i frankrike lager
 
 #Förberedande för första dashboarden
-OS_fr_df_years = sorted(OS_fr_df["Year"].unique()) #Sorterar åren i ordning och tar bort alla kopior så jag inte kan välja samma årtal flera gånger i dashboarden
-
+OS_fr_df_years = sorted(OS_fr_df["Year"].unique()), #Sorterar åren i ordning och tar bort alla kopior så jag inte kan välja samma årtal flera gånger i dashboarden
 
 #Förberedande för andra dashboarden
 medals_data = OS_fr_df[OS_fr_df['Medal'].notna()]
@@ -37,7 +36,7 @@ cities = OS_fr_df["City"].dropna().unique()
 cities_sorted = sorted(cities)
 
 #Förberedande för sjätte dashboarden
-gender_counts = OS_fr_df.drop_duplicates(subset=["ID"]).groupby("Sex").size().reset_index(name="Count")
+gender_counts = OS_fr_df.drop_duplicates(subset=["ID"]).groupby("Sex").size().reset_index(name="players")
 
 #Förberedande för sjunde dashboarden
 sport = OS_fr_df["Sport"].dropna().unique()
@@ -110,7 +109,7 @@ app.layout = html.Div([
     html.Div([
         html.H2(children="Hur många kvinnor och män var med och tävlade för frankrike i OS"),
         dcc.Graph(
-            figure=px.histogram(gender_counts, x="Sex", y="Count", color="Sex")
+            figure=px.histogram(gender_counts, x="Sex", y="players", color="Sex")
         )
     ]),
     html.Hr(),

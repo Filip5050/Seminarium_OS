@@ -137,7 +137,8 @@ def update_age_distribution(selected_sport):
 )
 def player_graph(selected_sport):
     filtered_data = OS_df[OS_df["Sport"] == selected_sport] #filtrerar datan så jag bara får ut data från sporten jag väljer
-    players = filtered_data.groupby("NOC").size().reset_index(name="Players") #förbereder datan för histogramen så länderna får ut antal spelare som spelade sporterna 
+    players = filtered_data.drop_duplicates(subset=["ID"]) #Tar bort duplicates av spelarna
+    players= players.groupby("NOC").size().reset_index(name="Players") #Grupperar spelarna till sit land vilket gör de enklare för dom att räknas och får fram ett nummer på hur många de blir
     #bygger histogramen
     fig = px.histogram(players, x="NOC", y="Players", barmode="stack", labels=f" Hur många spelare i läderna i{selected_sport}")
     fig.update_layout(
