@@ -87,7 +87,7 @@ app.layout = html.Div([
     html.Div([
         html.H2(children="Histogram över åldrarna"),
         dcc.Graph(
-            figure=px.histogram(OS_fr_df, x="Age", color="Age")
+            figure=px.histogram(ages_sort_OS, x="Age", color="Age")
         )
     ]),
     html.Hr(),
@@ -181,7 +181,7 @@ def update_height(selected_sport):
     #filtrera datan för valda sporten
     filtered_sport = OS_fr_df[OS_fr_df["Sport"] == selected_sport]
     #Förberedande för sjunde dashboarden
-    fig = px.histogram(filtered_sport, x="Height", color="Height", barmode="group", nbins=10, title=f"Höjden på spelarna i {selected_sport}")
+    fig = px.histogram(filtered_sport, x="Height", color="Height",  barmode="group", nbins=10, title=f"Höjden på spelarna i {selected_sport}")
     fig.update_layout(
         xaxis_title="Längd",
         yaxis_title="Antal Idrottare",

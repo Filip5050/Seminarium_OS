@@ -4,7 +4,7 @@ from dash import Dash, dcc, html, Input, Output
 import os
 
 #Läser in filen
-file_path = os.path.join(os.path.dirname(__file__), "athlete_events.csv")
+file_path = os.path.join(os.path.dirname(__file__), "athlete_events.csv") 
 OS_df = pd.read_csv(file_path)
 
 app = Dash(__name__) # initiserar Dash
