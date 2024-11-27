@@ -14,7 +14,7 @@ def hash_name(name):
 OS_fr_df['Name'] = OS_fr_df['Name'].apply(hash_name) #Här anonymiserar alla spelare i frankrike lager
 
 #Förberedande för första dashboarden
-OS_fr_df_years = sorted(OS_fr_df["Year"].unique()), #Sorterar åren i ordning och tar bort alla kopior så jag inte kan välja samma årtal flera gånger i dashboarden
+OS_fr_df_years = sorted(OS_fr_df["Year"].unique()) #Sorterar åren i ordning och tar bort alla kopior så jag inte kan välja samma årtal flera gånger i dashboarden
 
 #Förberedande för andra dashboarden
 medals_data = OS_fr_df[OS_fr_df['Medal'].notna()]
@@ -23,9 +23,7 @@ medals_by_sport = medals_data.groupby(["Sport"]).size().reset_index(name="medals
 sorted_sports = medals_by_sport.sort_values("medals", ascending=False)
 
 #Förberendade för tredje dashboarde 
-team_medals = OS_fr_df[OS_fr_df['Medal'].notna()]
-team_medals = team_medals.drop_duplicates(subset=["Event", "Games", "Medal"])
-medals_per_OS = team_medals.groupby("Games").size().reset_index(name="Medals")
+medals_per_OS = medals_data.groupby("Games").size().reset_index(name="Medals") #tar samma dataframe från förra dashboarden men grupperar istället "Games" istället
 
 
 #Förberedande för fjärde dashboarden
@@ -136,7 +134,7 @@ app.layout = html.Div([
 def update_graph(selected_year):
     filtered_df = OS_fr_df[OS_fr_df["Year"] == selected_year] #filtrerar datan så jag bara får ut data från året jag väljer
     medals = filtered_df.groupby("Medal").size().reset_index(name="number of medals") #Grupperar de olika medaljen för de olika typerna vilket behövs föra att skapa histogramen och ändrar indexet namn till number of medals
-    fig = px.histogram(medals, x="Medal", y="number of medals", color="Medal", color_discrete_map={
+    fig = px.histogram(medals, x="Medal", y="number of medals", color= "Medal", color_discrete_map={
             "Gold": "yellow", 
             "Silver": "grey", 
             "Bronze": "brown",}, 
